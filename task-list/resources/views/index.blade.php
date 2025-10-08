@@ -1,3 +1,9 @@
+@extends('layouts.app')
+
+@section('title', 'The list of tasks')
+
+@section('content')
+
 <h1>Tasks List</h1>
 <div>
     {{-- @if(count($tasks))
@@ -20,3 +26,5 @@
     <div>There are no tasks!</div>
     @endforelse
 </div>
+
+@endsection()
