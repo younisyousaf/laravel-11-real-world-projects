@@ -1,8 +1,7 @@
 @extends('layouts.app')
 
-@endsection -->
-
 @section('content')
 {{-- Sub View --}}
-@include('form')
+@include('form', ['task' => $task])
+
 @endsection

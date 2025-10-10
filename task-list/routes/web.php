@@ -26,6 +26,9 @@
 // });
 
 // use App\Models\Task ;
+
+use App\Http\Requests\TaskRequest;
+use App\Models\Task as ModelsTask;
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -88,7 +91,7 @@ Route::get('/', function () {
 
 Route::get('/tasks', function () {
     return view('index', [
-        'tasks' => \App\Models\Task::all()
+        'tasks' => ModelsTask::latest()->paginate()
 
         // It lets you get the more recents records being created/saved
         // 'tasks' => \App\Models\Task::latest()->get()
@@ -98,30 +101,50 @@ Route::get('/tasks', function () {
     ]);
 })->name('tasks.index');
 
+// Render Create View
 Route::view('/tasks/create', 'create')
-    ->name('tasks.create')
-;
+    ->name('tasks.create');
 
-Route::get('/tasks/{id}', function ($id) {
+
+// Edit Task
+Route::get('/tasks/{task}/edit', function (ModelsTask $task) {
+    return view('edit', [
+        'task' =>   $task
+    ]);
+})->name('tasks.edit');
+
+// Get Single Task
+Route::get('/tasks/{task}', function (ModelsTask $task) {
     return view('show', [
-        'task' =>   \App\Models\Task::findOrFail($id)
+        'task' => $task
     ]);
 })->name('tasks.show');
 
-Route::post('/tasks', function (Request $request) {
-    $data = $request->validate([
-        'title' => 'required|max:255',
-        'description' => 'required',
-        'long_description' => 'required'
-    ]);
+// Create Task
+Route::post('/tasks', function (TaskRequest $request) {
+    $task = ModelsTask::create($request->validated());
 
-    $task = new \App\Models\Task;
-    $task->title = $data['title'];
-    $task->description = $data['description'];
-    $task->long_description = $data['long_description'];
-
-    $task->save();
-
-    return redirect()->route('tasks.show', ['id' => $task->id])
+    return redirect()->route('tasks.show', ['task' => $task->id])
         ->with('success', 'Task created successfully!');
 })->name('tasks.store');
+
+// Update Task
+Route::put('/tasks/{task}', function (ModelsTask $task, TaskRequest $request) {
+    $task->update($request->validated());
+
+    return redirect()->route('tasks.show', ['task' => $task->id])
+        ->with('success', 'Task updated successfully!');
+})->name('tasks.update');
+
+// Delete Task
+Route::delete('/tasks/{task}', function (ModelsTask $task) {
+    $task->delete();
+
+    return redirect()->route('tasks.index')->with('success', 'Task deleted successfully!');
+})->name('tasks.destroy');
+
+// Toggle Complete
+Route::put('/tasks/{task}/toggle-complete', function (ModelsTask $task) {
+    $task->toggleComplete();
+    return redirect()->back()->with('success', 'Task updated successfully!');
+})->name('tasks.toggle-complete');
