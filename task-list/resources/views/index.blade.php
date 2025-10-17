@@ -5,7 +5,7 @@
 @section('content')
 
 <nav class="mb-4">
-    <a class="font-medium text-gray-700 underline decoration-pink-500" href="{{ route('tasks.create') }}">
+    <a class="link" href="{{ route('tasks.create') }}">
         Add Task!
     </a>
 </nav>
